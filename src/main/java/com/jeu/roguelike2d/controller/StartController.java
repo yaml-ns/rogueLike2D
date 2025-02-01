@@ -6,13 +6,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
+import java.io.File;
 import java.io.IOException;
-
+import javax.sound.sampled.*;
 public class StartController {
 
     @FXML private ImageView backgroundImage;
@@ -32,13 +34,19 @@ public class StartController {
         backgroundImage.setFitWidth(width);
         backgroundImage.setFitHeight(height);
         backgroundImage.setPreserveRatio(false);
+
+//        String soundFile = "file:src/main/resources/com/jeu/roguelike2d/sons/epic.wav";
+//        AudioClip audioClip = new AudioClip(soundFile);
+//        audioClip.setCycleCount(AudioClip.INDEFINITE);
+//        audioClip.play();
+
     }
 
     @FXML
     public void startGame() throws IOException {
         String playerName = nameField.getText().trim();
         if (!playerName.isEmpty()) {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/view/GameView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jeu/roguelike2d/view/game-view.fxml"));
             Parent root = loader.load();
             double width = Screen.getPrimary().getBounds().getWidth();
             double height = Screen.getPrimary().getBounds().getHeight();

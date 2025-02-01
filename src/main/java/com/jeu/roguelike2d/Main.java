@@ -12,7 +12,6 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         double width = Screen.getPrimary().getBounds().getWidth();
         double height = Screen.getPrimary().getBounds().getHeight();
-        System.out.println(height);
         FXMLLoader loader = new FXMLLoader(com.jeu.roguelike2d.Main.class.getResource("view/start-view.fxml"));
         Scene scene = new Scene(loader.load(), width, height);
 

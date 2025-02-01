@@ -22,6 +22,11 @@
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>21.0.4</version> <!-- Pour les fonctionnalités multimédia -->
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>21</version>
         </dependency>
