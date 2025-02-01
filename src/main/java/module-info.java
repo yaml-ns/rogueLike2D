@@ -7,6 +7,6 @@ module com.jeu.roguelike2d {
 
     opens com.jeu.roguelike2d to javafx.fxml;
     exports com.jeu.roguelike2d;
-    exports com.jeu.roguelike2d.controllers;
-    opens com.jeu.roguelike2d.controllers to javafx.fxml;
+    exports com.jeu.roguelike2d.controller;
+    opens com.jeu.roguelike2d.controller to javafx.fxml;
 }

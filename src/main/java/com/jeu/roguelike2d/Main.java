@@ -1,23 +1,33 @@
 package com.jeu.roguelike2d;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.util.Objects;
 
 public class Main extends Application {
     @Override
-    public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("start-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
-        stage.setScene(scene);
-        stage.show();
+    public void start(Stage primaryStage) throws Exception {
+        double width = Screen.getPrimary().getBounds().getWidth();
+        double height = Screen.getPrimary().getBounds().getHeight();
+        FXMLLoader loader = new FXMLLoader(com.jeu.roguelike2d.Main.class.getResource("view/start-view.fxml"));
+        Scene scene = new Scene(loader.load(), width, height);
+
+        scene.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("styles.css")).toExternalForm());
+        primaryStage.setScene(scene);
+        primaryStage.setScene(scene);
+        primaryStage.setX(0);
+        primaryStage.setY(0);
+        primaryStage.setWidth(width);
+        primaryStage.setHeight(height);
+        primaryStage.setResizable(false);
+        primaryStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 }
