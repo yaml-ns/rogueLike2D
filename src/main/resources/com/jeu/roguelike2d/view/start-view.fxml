@@ -1,19 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jeu.roguelike2d.controller.StartController">
-    <ImageView fitHeight="1080" fitWidth="1920">
-      <image>
-         <Image url="@../images/game-bg-2.png" />
-      </image></ImageView>
-    <VBox alignment="CENTER" layoutX="593.0" layoutY="380.0" spacing="20" style="-fx-background-color: rgba(0, 0, 0, 0.5);">
-        <TextField fx:id="nameField" promptText="Entrez votre nom..." />
-        <Button fx:id="startButton" onAction="#startGame" text="Start" />
+    <ImageView fx:id="backgroundImage" preserveRatio="true">
+    </ImageView>
+    <VBox alignment="CENTER" layoutX="129.0" layoutY="67.0" spacing="20" style="-fx-background-color: rgba(0, 0, 0, 0.5);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox alignment="CENTER" fillWidth="false" prefHeight="250.0" prefWidth="400.0">
+         <children>
+            <Label text="Rogue Like" textFill="#845f01">
+               <font>
+                  <Font name="Algerian" size="55.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </Label>
+              <TextField fx:id="nameField" alignment="CENTER" prefHeight="45.0" prefWidth="312.0" promptText="Entrez votre nom..." styleClass="name-input">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </TextField>
+            <HBox alignment="CENTER" prefHeight="58.0" prefWidth="310.0" spacing="10.0">
+               <children>
+                    <Button fx:id="startButton" onAction="#startGame" prefHeight="45.0" prefWidth="120.0" styleClass="start-view-button" text="Start" textFill="#d4d4d4">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="closeButton" mnemonicParsing="false" onAction="#handleCloseButtonAction" prefHeight="45.0" prefWidth="120.0" styleClass="start-view-button" text="Quitter" textFill="#d4d4d4">
+                     <font>
+                        <Font size="22.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
     </VBox>
 </AnchorPane>

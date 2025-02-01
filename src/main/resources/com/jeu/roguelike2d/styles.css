@@ -1,0 +1,10 @@
+.start-view-button {
+    -fx-background-color: rgba(18, 18, 18, 0.8);
+}
+.start-view-button:hover {
+    -fx-background-color: rgba(18, 18, 18, 1);
+}
+.name-input {
+    -fx-background-color: rgba(18, 18, 18, 0.8);
+    -fx-text-fill: #d7d7d7;
+}

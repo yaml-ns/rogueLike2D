@@ -6,6 +6,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,10 +14,25 @@ import javafx.scene.Parent;
 import java.io.IOException;
 
 public class StartController {
+
+    @FXML private ImageView backgroundImage;
     @FXML private TextField nameField;
     @FXML private Button startButton;
+    @FXML private Button closeButton;
 
 
+
+    @FXML
+    public void initialize(){
+        Image image = new Image(getClass().getResource("/com/jeu/roguelike2d/images/game-bg-2.png").toExternalForm());
+        backgroundImage.setImage(image);
+        double width = Screen.getPrimary().getBounds().getWidth();
+        double height = Screen.getPrimary().getBounds().getHeight();
+
+        backgroundImage.setFitWidth(width);
+        backgroundImage.setFitHeight(height);
+        backgroundImage.setPreserveRatio(false);
+    }
 
     @FXML
     public void startGame() throws IOException {
@@ -24,10 +40,18 @@ public class StartController {
         if (!playerName.isEmpty()) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/view/GameView.fxml"));
             Parent root = loader.load();
+            double width = Screen.getPrimary().getBounds().getWidth();
+            double height = Screen.getPrimary().getBounds().getHeight();
 
             Stage stage = (Stage) startButton.getScene().getWindow();
-            Scene gameScene = new Scene(root, 1920, 1080);
+            Scene gameScene = new Scene(root, width, height);
             stage.setScene(gameScene);
         }
+    }
+
+    @FXML
+    private void handleCloseButtonAction() {
+        Stage stage = (Stage) closeButton.getScene().getWindow();
+        stage.close();
     }
 }
