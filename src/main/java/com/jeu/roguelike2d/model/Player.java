@@ -27,29 +27,6 @@ public class Player {
     }
 
 
-    public Projectile shoot(Direction direction) {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastShotTime < SHOOT_COOLDOWN) {
-            return null;
-        }
-
-        lastShotTime = currentTime;
-
-        double dirX = 0, dirY = 0;
-        switch (direction) {
-            case UP: dirY = -1; break;
-            case DOWN: dirY = 1; break;
-            case LEFT: dirX = -1; break;
-            case RIGHT: dirX = 1; break;
-        }
-
-        return new Projectile(
-                x + GameController.CELL_SIZE / 2,
-                y + GameController.CELL_SIZE / 2,
-                dirX, dirY, true
-        );
-    }
-
     public void takeDamage(int damage) {
         health -= damage;
         if (health < 0) health = 0;

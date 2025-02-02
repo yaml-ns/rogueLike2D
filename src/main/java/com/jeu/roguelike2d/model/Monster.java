@@ -118,8 +118,8 @@ public class Monster {
         double dirY = playerY - currentY;
 
         return new Projectile(
-                currentX + GameController.CELL_SIZE / 2,
-                currentY + GameController.CELL_SIZE / 2,
+                currentX + (double) GameController.CELL_SIZE / 2,
+                currentY + (double) GameController.CELL_SIZE / 2,
                 dirX, dirY, false
         );
     }
