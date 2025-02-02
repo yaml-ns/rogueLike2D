@@ -12,6 +12,7 @@ import java.util.Stack;
 public class MazeGenerator {
     private final int cols, rows;
     private final int cellSize;
+
     private final Cell[][] grid;
     private final Stack<Cell> stack = new Stack<>();
     private Cell current;
@@ -42,6 +43,13 @@ public class MazeGenerator {
         }
     }
 
+    public int getWidth() {
+        return grid[0].length;
+    }
+
+    public int getHeight() {
+        return grid.length;
+    }
     public boolean canMove(int x, int y, int dx, int dy) {
         int newX = x + dx;
         int newY = y + dy;
@@ -56,7 +64,6 @@ public class MazeGenerator {
             return false; // Fin de la génération
         }
 
-        // Récupérer une cellule non visitée
         Cell next = current.getRandomNeighbor(grid, cols, rows);
         if (next != null) {
             next.visited = true;
@@ -70,7 +77,6 @@ public class MazeGenerator {
     }
 
     private void placeDoor() {
-        // Place the door at the bottom-right cell of the maze
         doorCell = grid[cols - 1][rows - 1];
     }
 
@@ -124,7 +130,7 @@ public class MazeGenerator {
             int px = x * size;
             int py = y * size;
 
-            double wallThickness = size * 0.3;
+            double wallThickness = size * 0.15;
             double overlap = wallThickness;
 
             gc.drawImage(floorTexture, px, py, size, size);
@@ -149,4 +155,6 @@ public class MazeGenerator {
             return neighbors.get(0);
         }
     }
+
+
 }

@@ -35,10 +35,10 @@ public class StartController {
         backgroundImage.setFitHeight(height);
         backgroundImage.setPreserveRatio(false);
 
-//        String soundFile = "file:src/main/resources/com/jeu/roguelike2d/sons/epic.wav";
-//        AudioClip audioClip = new AudioClip(soundFile);
-//        audioClip.setCycleCount(AudioClip.INDEFINITE);
-//        audioClip.play();
+        String soundFile = "file:src/main/resources/com/jeu/roguelike2d/sons/epic.wav";
+        AudioClip audioClip = new AudioClip(soundFile);
+        audioClip.setCycleCount(AudioClip.INDEFINITE);
+        audioClip.play();
 
     }
 
