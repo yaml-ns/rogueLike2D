@@ -15,15 +15,18 @@ public class MazeGenerator {
     private final Cell[][] grid;
     private final Stack<Cell> stack = new Stack<>();
     private Cell current;
+    private Cell doorCell;
     private final Image wallTexture;
     private final Image floorTexture;
+    private final Image doorTexture;
 
-    public MazeGenerator(int cols, int rows, int cellSize, Image wallTexture, Image floorTexture) {
+    public MazeGenerator(int cols, int rows, int cellSize, Image wallTexture, Image floorTexture, Image doorTexture) {
         this.cols = cols;
         this.rows = rows;
         this.cellSize = cellSize;
         this.wallTexture = wallTexture;
         this.floorTexture = floorTexture;
+        this.doorTexture = doorTexture;
         grid = new Cell[cols][rows];
 
         for (int x = 0; x < cols; x++) {
@@ -46,9 +49,14 @@ public class MazeGenerator {
         return !(dx == 1 && grid[x][y].right) && !(dx == -1 && grid[x][y].left) &&
                 !(dy == 1 && grid[x][y].bottom) && !(dy == -1 && grid[x][y].top);
     }
-    public boolean generateStep() {
-        if (stack.isEmpty()) return false;
 
+    public boolean generateStep() {
+        if (stack.isEmpty()) {
+            placeDoor();
+            return false; // Fin de la génération
+        }
+
+        // Récupérer une cellule non visitée
         Cell next = current.getRandomNeighbor(grid, cols, rows);
         if (next != null) {
             next.visited = true;
@@ -56,9 +64,14 @@ public class MazeGenerator {
             removeWall(current, next);
             current = next;
         } else {
-            current = stack.pop();
+            current = stack.pop(); // Backtracking
         }
         return true;
+    }
+
+    private void placeDoor() {
+        // Place the door at the bottom-right cell of the maze
+        doorCell = grid[cols - 1][rows - 1];
     }
 
     private void removeWall(Cell a, Cell b) {
@@ -79,9 +92,17 @@ public class MazeGenerator {
                 cell.draw(gc, cellSize, wallTexture, floorTexture);
             }
         }
+
+        if (doorCell != null) {
+            gc.drawImage(doorTexture, doorCell.getX() * cellSize, doorCell.getY() * cellSize, cellSize, cellSize);
+        }
     }
 
-    private static class Cell {
+    public Cell getDoorCell() {
+        return doorCell;
+    }
+
+    public class Cell {
         int x, y;
         boolean visited = false;
         boolean top = true, right = true, bottom = true, left = true;
@@ -89,6 +110,14 @@ public class MazeGenerator {
         Cell(int x, int y) {
             this.x = x;
             this.y = y;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
         }
 
         void draw(GraphicsContext gc, int size, Image wallTexture, Image floorTexture) {
@@ -106,7 +135,7 @@ public class MazeGenerator {
             if (right) gc.drawImage(wallTexture, px + size - overlap, py - overlap, wallThickness, size + wallThickness);
             if (bottom) gc.drawImage(wallTexture, px - overlap, py + size - overlap, size + wallThickness, wallThickness);
             if (left) gc.drawImage(wallTexture, px - overlap, py - overlap, wallThickness, size + wallThickness);
-          }
+        }
 
         Cell getRandomNeighbor(Cell[][] grid, int cols, int rows) {
             ArrayList<Cell> neighbors = new ArrayList<>();
