@@ -13,7 +13,7 @@ public class MazeGenerator {
 
 
     private final int cols, rows;
-    private final int cellWidth, cellHeight; // Nouveaux champs pour la largeur et la hauteur des cellules
+    private final int cellWidth, cellHeight;
     private final Cell[][] grid;
     private final Stack<Cell> stack = new Stack<>();
     private Cell current;
@@ -59,10 +59,25 @@ public class MazeGenerator {
     public boolean canMove(int x, int y, int dx, int dy) {
         int newX = x + dx;
         int newY = y + dy;
-        if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) return false;
-        return !(dx == 1 && grid[x][y].right) && !(dx == -1 && grid[x][y].left) &&
-                !(dy == 1 && grid[x][y].bottom) && !(dy == -1 && grid[x][y].top);
+
+        // Vérifier que les nouvelles coordonnées sont dans les limites du labyrinthe
+        if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) {
+            return false; // Hors des limites = mouvement impossible
+        }
+
+        // Récupérer la cellule actuelle et la cellule cible
+        Cell currentCell = grid[x][y];
+        Cell targetCell = grid[newX][newY];
+
+        // Vérifier les murs entre les deux cellules
+        if (dx == 1 && currentCell.right) return false; // Mur à droite
+        if (dx == -1 && currentCell.left) return false; // Mur à gauche
+        if (dy == 1 && currentCell.bottom) return false; // Mur en bas
+        if (dy == -1 && currentCell.top) return false; // Mur en haut
+
+        return true; // Pas de mur, mouvement possible
     }
+
 
     public boolean generateStep() {
         if (stack.isEmpty()) {
@@ -85,6 +100,15 @@ public class MazeGenerator {
         doorCell = grid[cols - 1][rows - 1];
     }
 
+    public boolean isCellFree(int x, int y) {
+
+        if (x < 0 || x >= cols || y < 0 || y >= rows) {
+            return false; // Hors des limites = non valide
+        }
+
+        Cell cell = grid[x][y];
+        return !(cell.top && cell.right && cell.bottom && cell.left);
+    }
     private void removeWall(Cell a, Cell b) {
         int dx = b.x - a.x;
         int dy = b.y - a.y;
