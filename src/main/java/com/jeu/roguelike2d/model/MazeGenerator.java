@@ -1,4 +1,4 @@
-package com.jeu.roguelike2d.utils;
+package com.jeu.roguelike2d.model;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -10,9 +10,10 @@ import java.util.Collections;
 import java.util.Stack;
 
 public class MazeGenerator {
-    private final int cols, rows;
-    private final int cellSize;
 
+
+    private final int cols, rows;
+    private final int cellWidth, cellHeight; // Nouveaux champs pour la largeur et la hauteur des cellules
     private final Cell[][] grid;
     private final Stack<Cell> stack = new Stack<>();
     private Cell current;
@@ -22,20 +23,24 @@ public class MazeGenerator {
     private final Image doorTexture;
 
     public MazeGenerator(int cols, int rows, int cellSize, Image wallTexture, Image floorTexture, Image doorTexture) {
+        this(cols, rows, cellSize, cellSize, wallTexture, floorTexture, doorTexture);
+    }
+
+    public MazeGenerator(int cols, int rows, int cellWidth, int cellHeight, Image wallTexture, Image floorTexture, Image doorTexture) {
         this.cols = cols;
         this.rows = rows;
-        this.cellSize = cellSize;
+        this.cellWidth = cellWidth;
+        this.cellHeight = cellHeight;
         this.wallTexture = wallTexture;
         this.floorTexture = floorTexture;
         this.doorTexture = doorTexture;
-        grid = new Cell[cols][rows];
 
+        grid = new Cell[cols][rows];
         for (int x = 0; x < cols; x++) {
             for (int y = 0; y < rows; y++) {
                 grid[x][y] = new Cell(x, y);
             }
         }
-
         if (cols > 0 && rows > 0) {
             current = grid[0][0];
             current.visited = true;
@@ -44,12 +49,13 @@ public class MazeGenerator {
     }
 
     public int getWidth() {
-        return grid[0].length;
+        return cols * cellWidth;
     }
 
     public int getHeight() {
-        return grid.length;
+        return rows * cellHeight;
     }
+
     public boolean canMove(int x, int y, int dx, int dy) {
         int newX = x + dx;
         int newY = y + dy;
@@ -63,7 +69,6 @@ public class MazeGenerator {
             placeDoor();
             return false; // Fin de la génération
         }
-
         Cell next = current.getRandomNeighbor(grid, cols, rows);
         if (next != null) {
             next.visited = true;
@@ -91,16 +96,14 @@ public class MazeGenerator {
 
     public void draw(GraphicsContext gc) {
         gc.setFill(Color.BLANCHEDALMOND);
-        gc.fillRect(0, 0, cols * cellSize, rows * cellSize);
-
+        gc.fillRect(0, 0, cols * cellWidth, rows * cellHeight); // Utilisation de cellWidth et cellHeight
         for (Cell[] row : grid) {
             for (Cell cell : row) {
-                cell.draw(gc, cellSize, wallTexture, floorTexture);
+                cell.draw(gc, cellWidth, cellHeight, wallTexture, floorTexture);
             }
         }
-
         if (doorCell != null) {
-            gc.drawImage(doorTexture, doorCell.getX() * cellSize, doorCell.getY() * cellSize, cellSize, cellSize);
+            gc.drawImage(doorTexture, doorCell.getX() * cellWidth, doorCell.getY() * cellHeight, cellWidth, cellHeight);
         }
     }
 
@@ -126,21 +129,35 @@ public class MazeGenerator {
             return y;
         }
 
-        void draw(GraphicsContext gc, int size, Image wallTexture, Image floorTexture) {
-            int px = x * size;
-            int py = y * size;
+        void draw(GraphicsContext gc, int width, int height, Image wallTexture, Image floorTexture) {
+            int px = x * width;
+            int py = y * height;
 
-            double wallThickness = size * 0.15;
+            // Dessiner le sol
+            if (floorTexture != null && !floorTexture.isError()) {
+                gc.drawImage(floorTexture, px, py, width, height);
+            } else {
+                gc.setFill(Color.LIGHTGRAY); // Couleur de secours pour le sol
+                gc.fillRect(px, py, width, height);
+            }
+
+            // Calculer l'épaisseur des murs
+            double wallThickness = Math.min(width, height) * 0.15;
             double overlap = wallThickness;
 
-            gc.drawImage(floorTexture, px, py, size, size);
-
-            gc.setFill(new ImagePattern(wallTexture, 0, 0, wallTexture.getWidth(), wallTexture.getHeight(), false));
-
-            if (top) gc.drawImage(wallTexture, px - overlap, py - overlap, size + wallThickness, wallThickness);
-            if (right) gc.drawImage(wallTexture, px + size - overlap, py - overlap, wallThickness, size + wallThickness);
-            if (bottom) gc.drawImage(wallTexture, px - overlap, py + size - overlap, size + wallThickness, wallThickness);
-            if (left) gc.drawImage(wallTexture, px - overlap, py - overlap, wallThickness, size + wallThickness);
+            // Dessiner les murs
+            if (wallTexture != null && !wallTexture.isError()) {
+                if (top) gc.drawImage(wallTexture, px - overlap, py - overlap, width + wallThickness, wallThickness);
+                if (right) gc.drawImage(wallTexture, px + width - overlap, py - overlap, wallThickness, height + wallThickness);
+                if (bottom) gc.drawImage(wallTexture, px - overlap, py + height - overlap, width + wallThickness, wallThickness);
+                if (left) gc.drawImage(wallTexture, px - overlap, py - overlap, wallThickness, height + wallThickness);
+            } else {
+                gc.setFill(Color.BLACK); // Couleur de secours pour les murs
+                if (top) gc.fillRect(px - overlap, py - overlap, width + wallThickness, wallThickness);
+                if (right) gc.fillRect(px + width - overlap, py - overlap, wallThickness, height + wallThickness);
+                if (bottom) gc.fillRect(px - overlap, py + height - overlap, width + wallThickness, wallThickness);
+                if (left) gc.fillRect(px - overlap, py - overlap, wallThickness, height + wallThickness);
+            }
         }
 
         Cell getRandomNeighbor(Cell[][] grid, int cols, int rows) {
@@ -149,12 +166,17 @@ public class MazeGenerator {
             if (x < cols - 1 && !grid[x + 1][y].visited) neighbors.add(grid[x + 1][y]);
             if (y > 0 && !grid[x][y - 1].visited) neighbors.add(grid[x][y - 1]);
             if (y < rows - 1 && !grid[x][y + 1].visited) neighbors.add(grid[x][y + 1]);
-
             if (neighbors.isEmpty()) return null;
             Collections.shuffle(neighbors);
             return neighbors.get(0);
         }
     }
 
+    public int getCols() {
+        return cols;
+    }
 
+    public int getRows() {
+        return rows;
+    }
 }

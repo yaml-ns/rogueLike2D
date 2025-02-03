@@ -22,6 +22,7 @@ public class Projectile {
     private final boolean isPlayerProjectile;
     private final Color color;
 
+
     public Projectile(double startX, double startY, double directionX, double directionY, boolean isPlayerProjectile) {
         this.x = startX;
         this.y = startY;
@@ -66,6 +67,11 @@ public class Projectile {
         return distance < (targetSize + SIZE/2);
     }
 
+    public void setPosition(double newX, double newY) {
+        this.x = newX;
+        this.y = newY;
+    }
+
     public boolean collidesWithWall(int gridX, int gridY, int cellSize) {
         if (!active) return false;
 
@@ -79,7 +85,6 @@ public class Projectile {
                 y >= topWall && y <= bottomWall;
     }
 
-    // Getters
     public double getX() { return x; }
     public double getY() { return y; }
     public int getDamage() { return DAMAGE; }
@@ -89,9 +94,11 @@ public class Projectile {
     // Setters
     public void deactivate() { active = false; }
 
-    // Méthodes utilitaires
     public static int getProjectileSize() { return SIZE; }
 
+    public double getDirectionX() { return directionX; }
+    public double getDirectionY() { return directionY; }
+    public static double getSpeed() { return SPEED; }
     @Override
     public String toString() {
         return String.format(

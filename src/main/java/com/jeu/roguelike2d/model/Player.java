@@ -1,104 +1,58 @@
 package com.jeu.roguelike2d.model;
-
-import com.jeu.roguelike2d.controller.GameController;
 import javafx.scene.image.Image;
 
-public class Player {
-    private int x, y;
-    private Direction direction;
-    private final Image upTexture;
-    private final Image downTexture;
-    private final Image leftTexture;
-    private final Image rightTexture;
+import java.util.Objects;
 
-    private static final long SHOOT_COOLDOWN = 500;
-    private long lastShotTime = 0;
-    private int health = 100;
-    public int getHealth() { return health; }
-    public boolean isAlive() { return health > 0; }
-    public Player(int x, int y, Image upTexture, Image downTexture, Image leftTexture, Image rightTexture) {
-        this.x = x;
-        this.y = y;
-        this.direction = Direction.DOWN;
-        this.upTexture = upTexture;
-        this.downTexture = downTexture;
-        this.leftTexture = leftTexture;
-        this.rightTexture = rightTexture;
+public class Player extends Character {
+    private final String weapon;
+    private final Image[] textures;
+    private Image currentTexture;
+
+
+    public Player(int health, int damage, String name, Image currentTexture) {
+        super(0, 0, health, damage, name, currentTexture);
+        this.currentTexture = currentTexture;
+        this.weapon = "Fusil";
+        this.textures = new Image[4];
+        this.textures[0] = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-up.png")));    // UP
+        this.textures[1] = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-front.png"))); // DOWN
+        this.textures[2] = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-left.png"))); // LEFT
+        this.textures[3] = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-right.png"))); // RIGHT
+
     }
 
-
-    public void takeDamage(int damage) {
-        health -= damage;
-        if (health < 0) health = 0;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
-    public Image getCurrentTexture() {
+    public void setDirectionTexture(Direction direction) {
         switch (direction) {
-            case UP:
-                return upTexture;
-            case DOWN:
-                return downTexture;
-            case LEFT:
-                return leftTexture;
-            case RIGHT:
-                return rightTexture;
-            default:
-                return downTexture;
+            case UP -> currentTexture = textures[0];
+            case DOWN -> currentTexture = textures[1];
+            case LEFT -> currentTexture = textures[2];
+            case RIGHT -> currentTexture = textures[3];
         }
     }
 
-    public enum Direction {
-        UP, DOWN, LEFT, RIGHT
+    @Override
+    public boolean move(int dx, int dy, MazeGenerator maze) {
+        int newX = x + dx;
+        int newY = y + dy;
+
+        if (maze.canMove(x, y, dx, dy)) {
+            x = newX;
+            y = newY;
+
+            Direction direction = Direction.fromDelta(dx, dy);
+            setDirectionTexture(direction);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public Projectile shoot() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastShotTime < SHOOT_COOLDOWN) {
-            return null;
-        }
+    @Override
+    public Image getTexture() {
+        return currentTexture;
+    }
 
-        lastShotTime = currentTime;
-
-        // Position de départ au centre du joueur
-        double startX = x * GameController.CELL_SIZE + GameController.CELL_SIZE / 2;
-        double startY = y * GameController.CELL_SIZE + GameController.CELL_SIZE / 2;
-
-        // Direction basée sur l'orientation du joueur
-        double dirX = 0, dirY = 0;
-        switch (direction) {
-            case UP:    dirY = -1; break;
-            case DOWN:  dirY = 1;  break;
-            case LEFT:  dirX = -1; break;
-            case RIGHT: dirX = 1;  break;
-        }
-
-        System.out.println("Tir dans la direction: " + direction + " (dx=" + dirX + ", dy=" + dirY + ")");
-        return new Projectile(startX, startY, dirX, dirY, true);
+    public String getWeapon() {
+        return weapon;
     }
 }
-
-
