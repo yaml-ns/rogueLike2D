@@ -5,6 +5,7 @@ import java.util.Objects;
 
 public class Player extends Character {
     private final String weapon;
+    private int energy = 100;
     private final Image[] textures;
     private Image currentTexture;
 
@@ -54,5 +55,13 @@ public class Player extends Character {
 
     public String getWeapon() {
         return weapon;
+    }
+
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
     }
 }

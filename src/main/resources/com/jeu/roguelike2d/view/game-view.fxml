@@ -21,7 +21,7 @@
     <!-- Barre du haut (hauteur dynamique) -->
     <HBox fx:id="topBar" alignment="CENTER" fillHeight="false" maxHeight="45.0" prefHeight="45.0" spacing="20.0" style="-fx-background-color: rgba(0, 0, 0, 0.7); -fx-padding: 10px;" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <Label fx:id="playerNameLabel" style="-fx-text-fill: white;" text="Nom: ???" />
-      <ProgressBar prefWidth="200.0" progress="0.0" styleClass="energyProgress" />
+      <ProgressBar fx:id="energyProgress" prefWidth="200.0" progress="0.0" styleClass="energyProgressBar" />
       <ProgressBar fx:id="healthProgress" prefWidth="200.0" progress="1.0" styleClass="lifeProgressBar" />
         <Label fx:id="timeLabel" style="-fx-text-fill: white;" text="Temps: 00:00" />
       <Button fx:id="exit" mnemonicParsing="false" onAction="#exitGame" text="Quitter" />

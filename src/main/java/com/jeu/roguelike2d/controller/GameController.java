@@ -328,6 +328,7 @@ public class GameController {
         }
         drawEntity(player, gc);
         healthProgress.setProgress((double) player.getHealth()/100);
+        energyProgress.setProgress((double) player.getEnergy()/100);
         for (Monster monster : monsters) {
             drawEntity(monster, gc);
             monster.autoMove(maze);

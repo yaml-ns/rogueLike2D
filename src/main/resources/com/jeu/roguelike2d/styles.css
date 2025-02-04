@@ -25,6 +25,6 @@
     -fx-background-insets: 0;
     -fx-padding: 3;
     -fx-background-radius: 5px;
-    -fx-background-color: linear-gradient(to right, #4caf50, #8bc34a);
+    -fx-background-color: linear-gradient(to right, #1f83b9, #4aa3c3);
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 1);
 }
