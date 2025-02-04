@@ -2,16 +2,22 @@ package com.jeu.roguelike2d.controller;
 
 import com.jeu.roguelike2d.model.*;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +26,8 @@ import java.util.Objects;
 public class GameController {
     @FXML private Canvas canvas;
     @FXML private HBox topBar;
+    @FXML private Label playerNameLabel;
+    @FXML private Label timeLabel;
     @FXML private VBox sideBar;
     @FXML private Button exit;
     @FXML private Pane mazeContainer;
@@ -34,18 +42,37 @@ public class GameController {
     private boolean isMoving = false;
     private AnimationTimer monsterMovementAnimation;
 
+    private AnimationTimer timerAnimation;
+    private Long startTime;
+
+    private static final double PLAY_DURATION = 2.8;
+    private static final double PAUSE_DURATION = 7.5;
+    private double lastPosition = 0;
+    MediaPlayer soldierSounds;
     public void initialize() {
+        String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/radio-soldier-announcer-pack.mp3").toString();
+        Media sound = new Media(soundPath);
+        soldierSounds = new MediaPlayer(sound);
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO, event -> playSegment()), // Démarrer immédiatement
+                new KeyFrame(Duration.seconds(PLAY_DURATION), event -> pauseSegment()), // Pause après 2.5s
+                new KeyFrame(Duration.seconds(PLAY_DURATION + PAUSE_DURATION), event -> playSegment()) // Reprendre après 7.5s
+        );
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
         canvas.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
+                startTime = System.nanoTime();
+                startTimer();
                 canvas.widthProperty().bind(newScene.widthProperty());
                 canvas.heightProperty().bind(newScene.heightProperty());
                 newScene.windowProperty().addListener((obs2, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        updateGrid(); // Initialiser le jeu une seule fois
+                        updateGrid();
                     }
                 });
 
-                // Activer les événements clavier
+
                 canvas.setOnKeyPressed(event -> {
                     switch (event.getCode()) {
                         case UP -> { currentDx = 0; currentDy = -1; }
@@ -71,6 +98,15 @@ public class GameController {
         mazeContainer.heightProperty().addListener((obs, oldVal, newVal) -> adjustCanvasSize());
     }
 
+    private void playSegment() {
+        soldierSounds.setStartTime(Duration.seconds(lastPosition));
+        soldierSounds.play();
+    }
+
+    private void pauseSegment() {
+        lastPosition = soldierSounds.getCurrentTime().toSeconds();
+        soldierSounds.pause();
+    }
     private void adjustCanvasSize() {
         double screenWidth = canvas.getWidth();
         double screenHeight = canvas.getHeight();
@@ -87,7 +123,7 @@ public class GameController {
     private void startMovement() {
         if (!isMoving && (currentDx != 0 || currentDy != 0)) {
             movePlayer(currentDx, currentDy);
-        }
+         }
     }
 
     private void startMonsterMovement() {
@@ -326,9 +362,30 @@ public class GameController {
         return maze;
     }
 
+
+    private void startTimer() {
+        timerAnimation = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+
+                double elapsedTime = (now - startTime) / 1_000_000_000.0;
+
+                int minutes = (int) (elapsedTime / 60);
+                int seconds = (int) (elapsedTime % 60);
+                timeLabel.setText(String.format("Time: %02d:%02d", minutes, seconds));
+            }
+        };
+
+        timerAnimation.start();
+    }
+
     @FXML
     public void exitGame() {
         Stage stage = (Stage) exit.getScene().getWindow();
         stage.close();
+    }
+
+    public void setName(String name){
+        this.playerNameLabel.setText(name);
     }
 }

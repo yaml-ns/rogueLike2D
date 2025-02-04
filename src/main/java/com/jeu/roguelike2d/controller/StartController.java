@@ -50,7 +50,8 @@ public class StartController {
             Parent root = loader.load();
             double width = Screen.getPrimary().getBounds().getWidth();
             double height = Screen.getPrimary().getBounds().getHeight();
-
+            GameController controller = loader.getController();
+            controller.setName(playerName);
             Stage stage = (Stage) startButton.getScene().getWindow();
             Scene gameScene = new Scene(root, width, height);
             stage.setScene(gameScene);
