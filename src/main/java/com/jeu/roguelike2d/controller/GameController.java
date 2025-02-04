@@ -140,6 +140,7 @@ public class GameController {
                         monster.autoMove(maze);
                     }
                 }
+                checkInteractions();
                 drawMaze();
             }
         };
@@ -316,6 +317,46 @@ public class GameController {
         drawMaze();
     }
 
+    private void checkInteractions() {
+        for (int i = 0; i < objects.size(); i++) {
+            StaticObject object = objects.get(i);
+            if (player.getX() == object.getX() && player.getY() == object.getY()) {
+
+                object.onContact(player);
+
+                if (object instanceof Reward) {
+                    objects.remove(i);
+                    i--;
+                }
+            }
+        }
+
+        for (Monster monster : monsters) {
+            if (player.getX() == monster.getX() && player.getY() == monster.getY()) {
+                handlePlayerMonsterCollision(player, monster);
+            }
+        }
+    }
+
+    private void handlePlayerMonsterCollision(Player player, Monster monster) {
+        player.takeDamage(monster.getDamage());
+        monster.takeDamage(player.getDamage());
+
+        if (!monster.isAlive()) {
+            monsters.remove(monster); // Supprimer le monstre de la liste
+        }
+
+        if (!player.isAlive()) {
+            stopGame();
+        }
+    }
+    private void stopGame() {
+        if (monsterMovementAnimation != null) {
+            monsterMovementAnimation.stop();
+        }
+        drawMaze();
+        System.out.println("Game stopped.");
+    }
     private void drawMaze() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Effacer tout le canevas
@@ -360,10 +401,6 @@ public class GameController {
         }
 
         return false;
-    }
-
-    public MazeGenerator getMaze() {
-        return maze;
     }
 
 
