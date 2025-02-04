@@ -359,11 +359,13 @@ public class GameController {
                     if (!triggeredTraps.contains(object)) {
                         object.onContact(player);
                         triggeredTraps.add(object);
+                        playTrapSound();
                     }
                 } else if (object instanceof Reward) {
 
                     object.onContact(player);
                     iterator.remove();
+                    playRewardSound();
                 }
             } else {
                 triggeredTraps.remove(object);
@@ -448,11 +450,7 @@ public class GameController {
                     iterator.remove();
 
                     if (monster.getHealth() <= 0 ) {
-                        System.out.println("Le monstre est mort");
                         monsterIterator.remove();
-                    }else{
-                        System.out.println("monstre pas mort");
-                        System.out.println("monster health : " + monster.getHealth());
                     }
 
                     break;
@@ -464,11 +462,10 @@ public class GameController {
     }
 
     private boolean checkProjectileMonsterCollision(Projectile projectile, Monster monster, int cellWidth, int cellHeight) {
-        // Convertir les coordonnées du projectile en coordonnées de grille
+
         int projectileX = (int) Math.floor(projectile.getX() / cellWidth);
         int projectileY = (int) Math.floor(projectile.getY() / cellHeight);
 
-        // Vérifier si le projectile est dans la même cellule que le monstre
         return projectileX == monster.getX() && projectileY == monster.getY();
     }
     private int[] getRandomValidPosition() {
@@ -526,6 +523,18 @@ public class GameController {
 
     private void playGunShotSound() {
         String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/gun-shot.mp3").toString();
+        Media sound = new Media(soundPath);
+        MediaPlayer explosionSound = new MediaPlayer(sound);
+        explosionSound.play();
+    }
+    private void playRewardSound() {
+        String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/game-bonus.mp3").toString();
+        Media sound = new Media(soundPath);
+        MediaPlayer explosionSound = new MediaPlayer(sound);
+        explosionSound.play();
+    }
+    private void playTrapSound() {
+        String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/ouch.mp3").toString();
         Media sound = new Media(soundPath);
         MediaPlayer explosionSound = new MediaPlayer(sound);
         explosionSound.play();
