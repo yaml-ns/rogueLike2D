@@ -37,6 +37,14 @@ public abstract class Entity {
         return realY.get();
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public void setRealX(double realX) {
         this.realX.set(realX);
     }

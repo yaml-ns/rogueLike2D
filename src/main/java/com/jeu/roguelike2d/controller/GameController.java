@@ -32,7 +32,7 @@ public class GameController {
     private int currentDy = 0;
     private boolean isMoving = false;
     private AnimationTimer monsterMovementAnimation;
-    @FXML
+
     public void initialize() {
         canvas.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
@@ -40,10 +40,11 @@ public class GameController {
                 canvas.heightProperty().bind(newScene.heightProperty());
                 newScene.windowProperty().addListener((obs2, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        updateGrid();
+                        updateGrid(); // Initialiser le jeu une seule fois
                     }
                 });
 
+                // Activer les événements clavier
                 canvas.setOnKeyPressed(event -> {
                     switch (event.getCode()) {
                         case UP -> { currentDx = 0; currentDy = -1; }
@@ -53,7 +54,6 @@ public class GameController {
                     }
                     startMovement();
                 });
-
 
                 canvas.setOnKeyReleased(event -> {
                     switch (event.getCode()) {
@@ -66,10 +66,23 @@ public class GameController {
             }
         });
 
-        mazeContainer.widthProperty().addListener((obs, oldVal, newVal) -> updateGrid());
-        mazeContainer.heightProperty().addListener((obs, oldVal, newVal) -> updateGrid());
+        mazeContainer.widthProperty().addListener((obs, oldVal, newVal) -> adjustCanvasSize());
+        mazeContainer.heightProperty().addListener((obs, oldVal, newVal) -> adjustCanvasSize());
     }
 
+    private void adjustCanvasSize() {
+        double screenWidth = canvas.getWidth();
+        double screenHeight = canvas.getHeight();
+        int cols = maze.getCols();
+        int rows = maze.getRows();
+
+        // Mettre à jour les dimensions des cellules
+        int cellWidth = (int) Math.round(screenWidth / cols);
+        int cellHeight = (int) Math.round(screenHeight / rows);
+
+        // Redessiner le labyrinthe avec les nouvelles dimensions
+        drawMaze();
+    }
     private void startMovement() {
         if (!isMoving && (currentDx != 0 || currentDy != 0)) {
             movePlayer(currentDx, currentDy);
@@ -77,7 +90,9 @@ public class GameController {
     }
 
     private void startMonsterMovement() {
+        ;
         monsterMovementAnimation = new AnimationTimer() {
+
             @Override
             public void handle(long now) {
                 for (Monster monster : monsters) {
@@ -90,6 +105,7 @@ public class GameController {
         };
         monsterMovementAnimation.start();
     }
+
     private void movePlayer(int dx, int dy) {
         if (player.move(dx, dy, maze)) {
             isMoving = true;
@@ -109,7 +125,7 @@ public class GameController {
         double startX = entity.getRealX();
         double startY = entity.getRealY();
 
-        final double speed = 40;
+        final double speed = 300;
         final long startTime = System.nanoTime();
 
         AnimationTimer movementAnimation = new AnimationTimer() {
@@ -119,12 +135,10 @@ public class GameController {
                 double progress = elapsedSeconds * speed;
 
                 if (progress >= Math.hypot(targetX - startX, targetY - startY)) {
-
                     entity.setRealX(targetX);
                     entity.setRealY(targetY);
                     this.stop();
                     drawMaze();
-
                     isMoving = false;
                     onComplete.run();
                 } else {
@@ -140,65 +154,29 @@ public class GameController {
         movementAnimation.start();
     }
 
-    public void animateMonsterMovement(Monster monster, int dx, int dy) {
-        int cellWidth = (int) Math.round(canvas.getWidth() / maze.getCols());
-        int cellHeight = (int) Math.round(canvas.getHeight() / maze.getRows());
-
-        double targetX = monster.getX() * cellWidth; // Position cible en pixels
-        double targetY = monster.getY() * cellHeight;
-
-        double startX = monster.getRealX(); // Position actuelle en pixels
-        double startY = monster.getRealY();
-
-        final double speed = 300; // Pixels par seconde
-        final long startTime = System.nanoTime();
-
-        AnimationTimer movementAnimation = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                double elapsedSeconds = (now - startTime) / 1_000_000_000.0;
-                double progress = elapsedSeconds * speed;
-
-                if (progress >= Math.hypot(targetX - startX, targetY - startY)) {
-                    // Forcer l'alignement exact à la fin de l'animation
-                    monster.setRealX(targetX);
-                    monster.setRealY(targetY);
-                    this.stop();
-                    drawMaze(); // Redessiner après l'animation
-                } else {
-                    // Calculer la position intermédiaire
-                    double newX = startX + (targetX - startX) * (progress / Math.hypot(targetX - startX, targetY - startY));
-                    double newY = startY + (targetY - startY) * (progress / Math.hypot(targetX - startX, targetY - startY));
-                    monster.setRealX(newX);
-                    monster.setRealY(newY);
-                    drawMaze(); // Redessiner pendant l'animation
-                }
-            }
-        };
-
-        movementAnimation.start();
-    }
     private void drawEntity(Entity entity, GraphicsContext gc) {
+
         int cellWidth = (int) Math.round(canvas.getWidth() / maze.getCols());
         int cellHeight = (int) Math.round(canvas.getHeight() / maze.getRows());
+        double px, py;
 
-        double px = entity.getRealX();
-        double py = entity.getRealY();
+        if (entity instanceof Monster){
+            px = ((Monster) entity).getCurrentX();
+            py = ((Monster) entity).getCurrentY();
+        }else{
+            px = entity.getRealX();
+            py = entity.getRealY();
+        }
 
         if (entity.getTexture() != null) {
             gc.drawImage(entity.getTexture(), px, py, cellWidth, cellHeight);
         } else {
-
             gc.setFill(Color.GRAY);
             gc.fillRect(px, py, cellWidth, cellHeight);
         }
     }
-    /**
-     * Met à jour les dimensions du labyrinthe et redessine
-     */
 
     private void updateGrid() {
-
         if (canvas.getScene() == null) {
             return;
         }
@@ -212,44 +190,42 @@ public class GameController {
         int cellWidth = (int) Math.round(screenWidth / cols);
         int cellHeight = (int) Math.round(screenHeight / rows);
 
-        Image wallTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/briques.jpg")));
+        Image wallTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/metal.png")));
         Image floorTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/pave.png")));
         Image doorTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/porte.jpg")));
 
         maze = new MazeGenerator(cols, rows, cellWidth, cellHeight, wallTexture, floorTexture, doorTexture);
         while (maze.generateStep());
-        player = new Player(100,0,"Djamel",new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-right.png"))));
+        player = new Player(100, 0, "Djamel", new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-right.png"))));
 
         monsters.clear();
 
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             int[] monsterPosition = getRandomValidPosition();
 
             Image dragonTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/dragon.png")));
-            Dragon dragon = new Dragon(monsterPosition[0], monsterPosition[1], dragonTexture);
+            Dragon dragon = new Dragon(monsterPosition[0], monsterPosition[1], dragonTexture,cellWidth, cellHeight);
             dragon.setRealX(monsterPosition[0] * cellWidth);
             dragon.setRealY(monsterPosition[1] * cellHeight);
             dragon.setController(this);
             monsters.add(dragon);
         }
-
         for (int i = 0; i < 5; i++) {
             int[] monsterPosition = getRandomValidPosition();
 
             Image chupacabraTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/chupacabra.png")));
-            Chupacabra chupacabra = new Chupacabra(monsterPosition[0], monsterPosition[1], chupacabraTexture, player);
+            Chupacabra chupacabra = new Chupacabra(monsterPosition[0], monsterPosition[1], chupacabraTexture,cellWidth, cellHeight);
             chupacabra.setRealX(monsterPosition[0] * cellWidth);
             chupacabra.setRealY(monsterPosition[1] * cellHeight);
             chupacabra.setController(this);
             monsters.add(chupacabra);
         }
-
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             int[] monsterPosition = getRandomValidPosition();
 
             Image goraTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/gora.png")));
-            Gora gora = new Gora(monsterPosition[0], monsterPosition[1], goraTexture, player);
+            Gora gora = new Gora(monsterPosition[0], monsterPosition[1], goraTexture,player, cellWidth, cellHeight);
             gora.setRealX(monsterPosition[0] * cellWidth);
             gora.setRealY(monsterPosition[1] * cellHeight);
             gora.setController(this);
@@ -259,15 +235,21 @@ public class GameController {
 
         drawMaze();
     }
+
     private void drawMaze() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Effacer tout le canevas
+
+        // Dessiner le labyrinthe
         maze.draw(gc);
-        drawEntity(player,gc);
+
+        // Dessiner le joueur
+        drawEntity(player, gc);
+
         for (Monster monster : monsters) {
             drawEntity(monster, gc);
+            monster.autoMove(maze);
         }
-
     }
 
     private int[] getRandomValidPosition() {
@@ -278,33 +260,31 @@ public class GameController {
         do {
             x = (int) (Math.random() * cols);
             y = (int) (Math.random() * rows);
-
         } while (!maze.isCellFree(x, y) || isPositionOccupiedByPlayerOrMonster(x, y));
         return new int[]{x, y};
     }
 
     private boolean isPositionOccupiedByPlayerOrMonster(int x, int y) {
-        // Vérifier si le joueur occupe cette position
         if (player.getX() == x && player.getY() == y) {
             return true;
         }
 
-        // Vérifier si un monstre occupe cette position
         for (Monster monster : monsters) {
             if (monster.getX() == x && monster.getY() == y) {
                 return true;
             }
         }
 
-        return false; // La position est libre
+        return false;
     }
-    /**
-     * Quitte le jeu
-     */
+
+    public MazeGenerator getMaze() {
+        return maze;
+    }
+
     @FXML
     public void exitGame() {
         Stage stage = (Stage) exit.getScene().getWindow();
         stage.close();
     }
 }
-

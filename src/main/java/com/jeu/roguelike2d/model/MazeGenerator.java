@@ -11,7 +11,6 @@ import java.util.Stack;
 
 public class MazeGenerator {
 
-
     private final int cols, rows;
     private final int cellWidth, cellHeight;
     private final Cell[][] grid;
@@ -60,29 +59,31 @@ public class MazeGenerator {
         int newX = x + dx;
         int newY = y + dy;
 
-        // Vérifier que les nouvelles coordonnées sont dans les limites du labyrinthe
         if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) {
-            return false; // Hors des limites = mouvement impossible
+            return false;
         }
 
-        // Récupérer la cellule actuelle et la cellule cible
         Cell currentCell = grid[x][y];
-        Cell targetCell = grid[newX][newY];
 
-        // Vérifier les murs entre les deux cellules
-        if (dx == 1 && currentCell.right) return false; // Mur à droite
-        if (dx == -1 && currentCell.left) return false; // Mur à gauche
-        if (dy == 1 && currentCell.bottom) return false; // Mur en bas
-        if (dy == -1 && currentCell.top) return false; // Mur en haut
+        if (dx == 1 && currentCell.right) {
+            return false;
+        }
+        if (dx == -1 && currentCell.left) {
+            return false;
+        }
+        if (dy == 1 && currentCell.bottom) {
+            return false;
+        }
+        if (dy == -1 && currentCell.top) {
+            return false;
+        }
 
-        return true; // Pas de mur, mouvement possible
+        return true;
     }
-
-
     public boolean generateStep() {
         if (stack.isEmpty()) {
             placeDoor();
-            return false; // Fin de la génération
+            return false;
         }
         Cell next = current.getRandomNeighbor(grid, cols, rows);
         if (next != null) {
@@ -91,7 +92,7 @@ public class MazeGenerator {
             removeWall(current, next);
             current = next;
         } else {
-            current = stack.pop(); // Backtracking
+            current = stack.pop();
         }
         return true;
     }
@@ -101,14 +102,14 @@ public class MazeGenerator {
     }
 
     public boolean isCellFree(int x, int y) {
-
         if (x < 0 || x >= cols || y < 0 || y >= rows) {
-            return false; // Hors des limites = non valide
+            return false;
         }
 
         Cell cell = grid[x][y];
         return !(cell.top && cell.right && cell.bottom && cell.left);
     }
+
     private void removeWall(Cell a, Cell b) {
         int dx = b.x - a.x;
         int dy = b.y - a.y;
@@ -120,7 +121,7 @@ public class MazeGenerator {
 
     public void draw(GraphicsContext gc) {
         gc.setFill(Color.BLANCHEDALMOND);
-        gc.fillRect(0, 0, cols * cellWidth, rows * cellHeight); // Utilisation de cellWidth et cellHeight
+        gc.fillRect(0, 0, cols * cellWidth, rows * cellHeight);
         for (Cell[] row : grid) {
             for (Cell cell : row) {
                 cell.draw(gc, cellWidth, cellHeight, wallTexture, floorTexture);
@@ -157,26 +158,23 @@ public class MazeGenerator {
             int px = x * width;
             int py = y * height;
 
-            // Dessiner le sol
             if (floorTexture != null && !floorTexture.isError()) {
                 gc.drawImage(floorTexture, px, py, width, height);
             } else {
-                gc.setFill(Color.LIGHTGRAY); // Couleur de secours pour le sol
+                gc.setFill(Color.LIGHTGRAY);
                 gc.fillRect(px, py, width, height);
             }
 
-            // Calculer l'épaisseur des murs
             double wallThickness = Math.min(width, height) * 0.15;
             double overlap = wallThickness;
 
-            // Dessiner les murs
             if (wallTexture != null && !wallTexture.isError()) {
                 if (top) gc.drawImage(wallTexture, px - overlap, py - overlap, width + wallThickness, wallThickness);
                 if (right) gc.drawImage(wallTexture, px + width - overlap, py - overlap, wallThickness, height + wallThickness);
                 if (bottom) gc.drawImage(wallTexture, px - overlap, py + height - overlap, width + wallThickness, wallThickness);
                 if (left) gc.drawImage(wallTexture, px - overlap, py - overlap, wallThickness, height + wallThickness);
             } else {
-                gc.setFill(Color.BLACK); // Couleur de secours pour les murs
+                gc.setFill(Color.BLACK);
                 if (top) gc.fillRect(px - overlap, py - overlap, width + wallThickness, wallThickness);
                 if (right) gc.fillRect(px + width - overlap, py - overlap, wallThickness, height + wallThickness);
                 if (bottom) gc.fillRect(px - overlap, py + height - overlap, width + wallThickness, wallThickness);
@@ -203,4 +201,22 @@ public class MazeGenerator {
     public int getRows() {
         return rows;
     }
+
+    public void printMaze() {
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < cols; x++) {
+                System.out.print(grid[x][y].top ? "+---" : "+   ");
+            }
+            for (int x = 0; x < cols; x++) {
+                System.out.print(grid[x][y].left ? "|   " : "    ");
+            }
+            System.out.println("|");
+        }
+
+        for (int x = 0; x < cols; x++) {
+            System.out.print("+---");
+        }
+        System.out.println("+");
+    }
+
 }

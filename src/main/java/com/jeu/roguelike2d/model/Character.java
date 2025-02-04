@@ -14,19 +14,17 @@ public abstract class Character extends Entity implements Movable {
 
     @Override
     public boolean move(int dx, int dy, MazeGenerator maze) {
-        int newX = x + dx;
-        int newY = y + dy;
+        int newX = getX() + dx;
+        int newY = getY() + dy;
 
-        if (maze.canMove(x, y, dx, dy)) {
-            x = newX;
-            y = newY;
+        if (maze.canMove(getX(), getY(), dx, dy)) {
+            setX(newX);
+            setY(newY);
             return true;
         } else {
-            System.out.println("Déplacement impossible !");
             return false;
         }
     }
-
     public void takeDamage(int damage) {
         health -= damage;
         if (health <= 0) {
