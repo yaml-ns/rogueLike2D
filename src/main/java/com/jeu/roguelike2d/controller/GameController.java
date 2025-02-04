@@ -28,6 +28,7 @@ public class GameController {
     private Player player;
 
     private List<Monster> monsters = new ArrayList<>();
+    private List<StaticObject> objects = new ArrayList<>();
     private int currentDx = 0;
     private int currentDy = 0;
     private boolean isMoving = false;
@@ -163,9 +164,12 @@ public class GameController {
         if (entity instanceof Monster){
             px = ((Monster) entity).getCurrentX();
             py = ((Monster) entity).getCurrentY();
-        }else{
+        }else if (entity instanceof Player){
             px = entity.getRealX();
             py = entity.getRealY();
+        }else{
+            px = entity.getX() * cellWidth;
+            py = entity.getY() * cellHeight;
         }
 
         if (entity.getTexture() != null) {
@@ -211,6 +215,7 @@ public class GameController {
             dragon.setController(this);
             monsters.add(dragon);
         }
+
         for (int i = 0; i < 5; i++) {
             int[] monsterPosition = getRandomValidPosition();
 
@@ -233,6 +238,42 @@ public class GameController {
         }
 
 
+        for (int i = 0; i < 4; i++) {
+            int[] objetPosition = getRandomValidPosition();
+
+            Image blueDiamondTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/blue-diamond.gif")));
+            Reward blueDiamond = new Reward(objetPosition[0], objetPosition[1], "Blue Diamond",blueDiamondTexture,20);
+            objects.add(blueDiamond);
+        }
+        for (int i = 0; i < 2; i++) {
+            int[] objetPosition = getRandomValidPosition();
+
+            Image diamonCollectionTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/diamonds-collection.gif")));
+            Reward diamondCollection = new Reward(objetPosition[0], objetPosition[1], "Diamond collection",diamonCollectionTexture,35);
+            objects.add(diamondCollection);
+        }
+        for (int i = 0; i < 3; i++) {
+            int[] objetPosition = getRandomValidPosition();
+
+            Image heartTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/heart.gif")));
+            Reward heart = new Reward(objetPosition[0], objetPosition[1], "Heart",heartTexture,35);
+            objects.add(heart);
+        }
+        for (int i = 0; i < 2; i++) {
+            int[] objetPosition = getRandomValidPosition();
+
+            Image holeTrapTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/hole-trap.gif")));
+            Trap holeTrap = new Trap(objetPosition[0], objetPosition[1], "Hole Trap",holeTrapTexture,40);
+            objects.add(holeTrap);
+        }
+        for (int i = 0; i < 4; i++) {
+            int[] objetPosition = getRandomValidPosition();
+
+            Image electricTrapTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/electrical-trap.gif")));
+            Trap electricTrap = new Trap(objetPosition[0], objetPosition[1], "Electric Trap",electricTrapTexture,10);
+            objects.add(electricTrap);
+        }
+
         drawMaze();
     }
 
@@ -243,13 +284,16 @@ public class GameController {
         // Dessiner le labyrinthe
         maze.draw(gc);
 
-        // Dessiner le joueur
+        for (StaticObject object : objects) {
+            drawEntity(object, gc);
+        }
         drawEntity(player, gc);
 
         for (Monster monster : monsters) {
             drawEntity(monster, gc);
             monster.autoMove(maze);
         }
+
     }
 
     private int[] getRandomValidPosition() {
