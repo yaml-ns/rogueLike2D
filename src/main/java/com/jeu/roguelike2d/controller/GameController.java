@@ -9,6 +9,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -26,6 +27,8 @@ import java.util.Objects;
 public class GameController {
     @FXML private Canvas canvas;
     @FXML private HBox topBar;
+    @FXML private ProgressBar healthProgress;
+    @FXML private ProgressBar energyProgress;
     @FXML private Label playerNameLabel;
     @FXML private Label timeLabel;
     @FXML private VBox sideBar;
@@ -324,7 +327,7 @@ public class GameController {
             drawEntity(object, gc);
         }
         drawEntity(player, gc);
-
+        healthProgress.setProgress((double) player.getHealth()/100);
         for (Monster monster : monsters) {
             drawEntity(monster, gc);
             monster.autoMove(maze);

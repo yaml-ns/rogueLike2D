@@ -51,7 +51,7 @@ public class StartController {
             double width = Screen.getPrimary().getBounds().getWidth();
             double height = Screen.getPrimary().getBounds().getHeight();
             GameController controller = loader.getController();
-            controller.setName(playerName);
+            controller.setName("Nom : " + playerName);
             Stage stage = (Stage) startButton.getScene().getWindow();
             Scene gameScene = new Scene(root, width, height);
             stage.setScene(gameScene);

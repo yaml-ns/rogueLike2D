@@ -8,3 +8,23 @@
     -fx-background-color: rgba(18, 18, 18, 0.8);
     -fx-text-fill: #d7d7d7;
 }
+.progress-bar {
+    -fx-background-color: rgba(7, 7, 7, 0.87);
+    -fx-border-color: black;         /* Bordure noire */
+    -fx-border-width: 2px;           /* Épaisseur de la bordure */
+    -fx-border-radius: 5px;
+}
+.lifeProgressBar  .bar {
+    -fx-background-insets: 0;
+    -fx-padding: 3;
+    -fx-background-radius: 5px;
+    -fx-background-color: linear-gradient(to right, #c70000, #7a0101);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 1);
+}
+.energyProgressBar  .bar {
+    -fx-background-insets: 0;
+    -fx-padding: 3;
+    -fx-background-radius: 5px;
+    -fx-background-color: linear-gradient(to right, #4caf50, #8bc34a);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 1);
+}

@@ -3,12 +3,13 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jeu.roguelike2d.controller.GameController">
+<AnchorPane stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jeu.roguelike2d.controller.GameController">
 
     <!-- Labyrinthe (remplit tout l'écran) -->
     <Pane fx:id="mazeContainer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -18,8 +19,10 @@
     </Pane>
 
     <!-- Barre du haut (hauteur dynamique) -->
-    <HBox fx:id="topBar" alignment="CENTER" fillHeight="false" maxHeight="45.0" prefHeight="45.0" style="-fx-background-color: rgba(0, 0, 0, 0.5); -fx-padding: 10px;" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <HBox fx:id="topBar" alignment="CENTER" fillHeight="false" maxHeight="45.0" prefHeight="45.0" spacing="20.0" style="-fx-background-color: rgba(0, 0, 0, 0.7); -fx-padding: 10px;" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <Label fx:id="playerNameLabel" style="-fx-text-fill: white;" text="Nom: ???" />
+      <ProgressBar prefWidth="200.0" progress="0.0" styleClass="energyProgress" />
+      <ProgressBar fx:id="healthProgress" prefWidth="200.0" progress="1.0" styleClass="lifeProgressBar" />
         <Label fx:id="timeLabel" style="-fx-text-fill: white;" text="Temps: 00:00" />
       <Button fx:id="exit" mnemonicParsing="false" onAction="#exitGame" text="Quitter" />
     </HBox>
