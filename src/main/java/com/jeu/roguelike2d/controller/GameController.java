@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,7 +45,8 @@ public class GameController {
     private int currentDy = 0;
     private boolean isMoving = false;
     private AnimationTimer monsterMovementAnimation;
-
+    private List<Monster> collidedMonsters = new ArrayList<>();
+    private List<StaticObject> triggeredTraps = new ArrayList<>();
     private AnimationTimer timerAnimation;
     private Long startTime;
 
@@ -318,26 +320,47 @@ public class GameController {
     }
 
     private void checkInteractions() {
-        for (int i = 0; i < objects.size(); i++) {
-            StaticObject object = objects.get(i);
+        // Parcourir les objets statiques
+        for (Iterator<StaticObject> iterator = objects.iterator(); iterator.hasNext(); ) {
+            StaticObject object = iterator.next();
             if (player.getX() == object.getX() && player.getY() == object.getY()) {
-
-                object.onContact(player);
-
-                if (object instanceof Reward) {
-                    objects.remove(i);
-                    i--;
+                if (object instanceof Trap) {
+                    // Vérifier si c'est une nouvelle interaction avec un piège
+                    if (!triggeredTraps.contains(object)) {
+                        object.onContact(player); // Appliquer les effets du piège
+                        triggeredTraps.add(object); // Marquer le piège comme "déclenché"
+                    }
+                } else if (object instanceof Reward) {
+                    // Les récompenses sont supprimées après interaction
+                    object.onContact(player);
+                    iterator.remove(); // Supprimer la récompense en toute sécurité
                 }
+            } else {
+                // Réinitialiser l'interaction si le joueur quitte la cellule du piège
+                triggeredTraps.remove(object);
             }
         }
 
-        for (Monster monster : monsters) {
+        // Parcourir les monstres
+        for (Iterator<Monster> iterator = monsters.iterator(); iterator.hasNext(); ) {
+            Monster monster = iterator.next();
             if (player.getX() == monster.getX() && player.getY() == monster.getY()) {
-                handlePlayerMonsterCollision(player, monster);
+                // Vérifier si c'est une nouvelle collision
+                if (!collidedMonsters.contains(monster)) {
+                    handlePlayerMonsterCollision(player, monster);
+                    collidedMonsters.add(monster); // Marquer le monstre comme "en collision"
+                }
+            } else {
+                // Réinitialiser la collision si le joueur quitte la cellule du monstre
+                collidedMonsters.remove(monster);
+            }
+
+            // Supprimer les monstres morts
+            if (!monster.isAlive()) {
+                iterator.remove(); // Supprimer le monstre en toute sécurité
             }
         }
     }
-
     private void handlePlayerMonsterCollision(Player player, Monster monster) {
         player.takeDamage(monster.getDamage());
         monster.takeDamage(player.getDamage());

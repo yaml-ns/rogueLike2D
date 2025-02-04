@@ -8,7 +8,7 @@ public class Dragon extends Monster {
     private GameController controller;
 
     public Dragon(int x, int y, Image texture, int cellWidth, int cellHeight) {
-        super(x, y, 100, 25, "Dragon", 10, texture, cellWidth, cellHeight);
+        super(x, y, 100, 15, "Dragon", 10, texture, cellWidth, cellHeight);
 
     }
 

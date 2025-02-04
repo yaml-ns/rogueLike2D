@@ -10,7 +10,7 @@ public class Chupacabra extends Monster {
 
     private GameController controller;
     public Chupacabra(int x, int y, Image texture,int cellWidth, int cellHeight) {
-        super(x, y, 40, 15, "Chupacabra", 3, texture, cellWidth, cellHeight);
+        super(x, y, 40, 8, "Chupacabra", 3, texture, cellWidth, cellHeight);
         this.setSpeed(80);
 
     }
