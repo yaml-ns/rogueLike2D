@@ -6,6 +6,7 @@ public abstract class Character extends Entity implements Movable {
     protected int health;
     protected int damage;
 
+    protected boolean isAlive = true;
     public Character(int x, int y, int health, int damage, String name, Image texture) {
         super(x, y, name, texture);
         this.health = health;
@@ -29,13 +30,14 @@ public abstract class Character extends Entity implements Movable {
         health -= damage;
         if (health <= 0) {
             System.out.println(name + " est mort !");
+            this.isAlive = false;
         } else {
             System.out.println(name + " a maintenant " + health + " points de vie.");
         }
     }
 
     public boolean isAlive() {
-        return health > 0;
+        return isAlive;
     }
 
     public void attack(Entity target) {

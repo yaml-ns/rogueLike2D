@@ -1,109 +1,105 @@
 package com.jeu.roguelike2d.model;
 
-import javafx.scene.paint.Color;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
 public class Projectile {
-    // Position du projectile
-    private double x;
-    private double y;
+    private double x, y;
+    private final int dx, dy;
+    private final double speed;
+    private final Image texture;
+    private boolean hasCollided = false; // Indicateur de collision
 
-    // Direction normalisée du projectile
-    private final double directionX;
-    private final double directionY;
-
-    // Paramètres du projectile
-    private static final double SPEED = 8.0;
-    private static final int SIZE = 8;
-    private static final int DAMAGE = 25;
-
-    // État du projectile
-    private boolean active = true;
-    private final boolean isPlayerProjectile;
-    private final Color color;
-
-
-    public Projectile(double startX, double startY, double directionX, double directionY, boolean isPlayerProjectile) {
+    public Projectile(double startX, double startY, int dx, int dy, Image texture) {
         this.x = startX;
         this.y = startY;
+        this.dx = dx;
+        this.dy = dy;
+        this.speed = 600;
+        this.texture = texture;
+    }
 
-        // Normalisation du vecteur de direction
-        double length = Math.sqrt(directionX * directionX + directionY * directionY);
-        if (length != 0) {
-            this.directionX = directionX / length;
-            this.directionY = directionY / length;
-        } else {
-            this.directionX = 0;
-            this.directionY = 0;
+    public void updatePosition(double deltaTime, MazeGenerator maze, int cellWidth, int cellHeight) {
+        if (hasCollided) {
+            return; // Ne rien faire si le projectile a déjà touché un mur
         }
 
-        this.isPlayerProjectile = isPlayerProjectile;
-        this.color = isPlayerProjectile ? Color.YELLOW : Color.RED;
+        double nextX = x + dx * speed * deltaTime;
+        double nextY = y + dy * speed * deltaTime;
+
+        // Calculer les positions de départ et d'arrivée en coordonnées de grille
+        int startX = (int) Math.floor(x / cellWidth);
+        int startY = (int) Math.floor(y / cellHeight);
+        int endX = (int) Math.floor(nextX / cellWidth);
+        int endY = (int) Math.floor(nextY / cellHeight);
+
+        // Vérifier toutes les cellules traversées et les murs entre elles
+        if (!isPathClear(startX, startY, endX, endY, maze, cellWidth, cellHeight)) {
+            // Collision détectée : marquer le projectile comme touché
+            hasCollided = true;
+            return;
+        }
+
+        // Mettre à jour la position du projectile
+        x = nextX;
+        y = nextY;
     }
 
-    public void update() {
-        if (!active) return;
+    private boolean isPathClear(int startX, int startY, int endX, int endY, MazeGenerator maze, int cellWidth, int cellHeight) {
+        int dx = Math.abs(endX - startX);
+        int dy = Math.abs(endY - startY);
+        int sx = (startX < endX) ? 1 : -1;
+        int sy = (startY < endY) ? 1 : -1;
+        int err = dx - dy;
 
-        // Mise à jour de la position
-        x += directionX * SPEED;
-        y += directionY * SPEED;
+        int currentX = startX;
+        int currentY = startY;
+
+        while (true) {
+            // Vérifier si la cellule actuelle est libre
+            if (!maze.isCellFree(currentX, currentY)) {
+                return false; // Collision détectée
+            }
+
+            // Vérifier les murs entre les cellules
+            if (currentX != startX || currentY != startY) {
+                if (currentX != startX && maze.hasWallBetween(currentX, currentY, currentX - sx, currentY)) {
+                    return false; // Mur horizontal détecté
+                }
+                if (currentY != startY && maze.hasWallBetween(currentX, currentY, currentX, currentY - sy)) {
+                    return false; // Mur vertical détecté
+                }
+            }
+
+            if (currentX == endX && currentY == endY) {
+                break; // Arrivé à destination
+            }
+
+            int e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                currentX += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                currentY += sy;
+            }
+        }
+        return true; // Aucune collision détectée
     }
 
-    public void draw(GraphicsContext gc) {
-        if (!active) return;
-
-        gc.setFill(color);
-        gc.fillOval(x - SIZE/2, y - SIZE/2, SIZE, SIZE);
+    public boolean hasCollided() {
+        return hasCollided; // Retourne true si le projectile a touché un mur
     }
 
-    public boolean collidesWith(double targetX, double targetY, double targetSize) {
-        if (!active) return false;
-
-        double distance = Math.sqrt(
-                Math.pow(x - targetX, 2) +
-                        Math.pow(y - targetY, 2)
-        );
-
-        return distance < (targetSize + SIZE/2);
+    public double getX() {
+        return x;
     }
 
-    public void setPosition(double newX, double newY) {
-        this.x = newX;
-        this.y = newY;
+    public double getY() {
+        return y;
     }
 
-    public boolean collidesWithWall(int gridX, int gridY, int cellSize) {
-        if (!active) return false;
-
-        // Vérifier si le projectile est à l'intérieur de la cellule
-        double leftWall = gridX * cellSize;
-        double rightWall = (gridX + 1) * cellSize;
-        double topWall = gridY * cellSize;
-        double bottomWall = (gridY + 1) * cellSize;
-
-        return x >= leftWall && x <= rightWall &&
-                y >= topWall && y <= bottomWall;
-    }
-
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public int getDamage() { return DAMAGE; }
-    public boolean isActive() { return active; }
-    public boolean isPlayerProjectile() { return isPlayerProjectile; }
-
-    // Setters
-    public void deactivate() { active = false; }
-
-    public static int getProjectileSize() { return SIZE; }
-
-    public double getDirectionX() { return directionX; }
-    public double getDirectionY() { return directionY; }
-    public static double getSpeed() { return SPEED; }
-    @Override
-    public String toString() {
-        return String.format(
-                "Projectile[x=%.2f, y=%.2f, dir=(%.2f,%.2f), active=%b, player=%b]",
-                x, y, directionX, directionY, active, isPlayerProjectile
-        );
+    public Image getTexture() {
+        return texture;
     }
 }

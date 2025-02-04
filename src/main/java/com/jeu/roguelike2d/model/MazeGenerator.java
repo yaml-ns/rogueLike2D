@@ -219,4 +219,23 @@ public class MazeGenerator {
         System.out.println("+");
     }
 
+    public boolean hasWallBetween(int x1, int y1, int x2, int y2) {
+        if (x1 == x2) {
+            // Déplacement vertical
+            if (y1 < y2) {
+                return grid[x1][y1].bottom || grid[x2][y2].top;
+            } else {
+                return grid[x1][y1].top || grid[x2][y2].bottom;
+            }
+        } else if (y1 == y2) {
+            // Déplacement horizontal
+            if (x1 < x2) {
+                return grid[x1][y1].right || grid[x2][y2].left;
+            } else {
+                return grid[x1][y1].left || grid[x2][y2].right;
+            }
+        }
+        return false; // Pas de mur si les cellules ne sont pas adjacentes
+    }
+
 }

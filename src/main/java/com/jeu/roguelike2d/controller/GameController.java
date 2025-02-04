@@ -41,8 +41,12 @@ public class GameController {
 
     private List<Monster> monsters = new ArrayList<>();
     private List<StaticObject> objects = new ArrayList<>();
+    private List<Projectile> projectiles = new ArrayList<>();
+    private Image bulletTexture;
     private int currentDx = 0;
     private int currentDy = 0;
+    private int lastDx = 0;
+    private int lastDy = 0;
     private boolean isMoving = false;
     private AnimationTimer monsterMovementAnimation;
     private List<Monster> collidedMonsters = new ArrayList<>();
@@ -65,6 +69,7 @@ public class GameController {
         );
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+        bulletTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/fireball-fire.gif")));
         canvas.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 startTime = System.nanoTime();
@@ -80,10 +85,14 @@ public class GameController {
 
                 canvas.setOnKeyPressed(event -> {
                     switch (event.getCode()) {
-                        case UP -> { currentDx = 0; currentDy = -1; }
-                        case DOWN -> { currentDx = 0; currentDy = 1; }
-                        case LEFT -> { currentDx = -1; currentDy = 0; }
-                        case RIGHT -> { currentDx = 1; currentDy = 0; }
+                        case UP -> { currentDx = 0; currentDy = -1; lastDx = 0; lastDy = -1; }
+                        case DOWN -> { currentDx = 0; currentDy = 1; lastDx = 0; lastDy = 1; }
+                        case LEFT -> { currentDx = -1; currentDy = 0; lastDx = -1; lastDy = 0; }
+                        case RIGHT -> { currentDx = 1; currentDy = 0; lastDx = 1; lastDy = 0; }
+                        case SPACE -> {
+                            shootProjectile();
+                            playGunShotSound();
+                        }
                     }
                     startMovement();
                 });
@@ -121,9 +130,31 @@ public class GameController {
         // Mettre à jour les dimensions des cellules
         int cellWidth = (int) Math.round(screenWidth / cols);
         int cellHeight = (int) Math.round(screenHeight / rows);
-
-        // Redessiner le labyrinthe avec les nouvelles dimensions
         drawMaze();
+    }
+
+    private void shootProjectile() {
+        int startX = player.getX();
+        int startY = player.getY();
+        int dx = lastDx;
+        int dy = lastDy;
+
+        if (dx == 0 && dy == 0) {
+            System.out.println("Cannot shoot: no direction selected.");
+            return;
+        }
+
+        int cellWidth = (int) Math.round(canvas.getWidth() / maze.getCols());
+        int cellHeight = (int) Math.round(canvas.getHeight() / maze.getRows());
+        double startXPixel = (startX + 0.5) * cellWidth;
+        double startYPixel = (startY + 0.5) * cellHeight;
+
+        // Créer un nouveau projectile
+        Projectile projectile = new Projectile(startXPixel, startYPixel, dx, dy, bulletTexture);
+        projectiles.add(projectile);
+
+
+//        SoundPlayer.playShootSound();
     }
     private void startMovement() {
         if (!isMoving && (currentDx != 0 || currentDy != 0)) {
@@ -320,44 +351,38 @@ public class GameController {
     }
 
     private void checkInteractions() {
-        // Parcourir les objets statiques
+
         for (Iterator<StaticObject> iterator = objects.iterator(); iterator.hasNext(); ) {
             StaticObject object = iterator.next();
             if (player.getX() == object.getX() && player.getY() == object.getY()) {
                 if (object instanceof Trap) {
-                    // Vérifier si c'est une nouvelle interaction avec un piège
                     if (!triggeredTraps.contains(object)) {
-                        object.onContact(player); // Appliquer les effets du piège
-                        triggeredTraps.add(object); // Marquer le piège comme "déclenché"
+                        object.onContact(player);
+                        triggeredTraps.add(object);
                     }
                 } else if (object instanceof Reward) {
-                    // Les récompenses sont supprimées après interaction
+
                     object.onContact(player);
-                    iterator.remove(); // Supprimer la récompense en toute sécurité
+                    iterator.remove();
                 }
             } else {
-                // Réinitialiser l'interaction si le joueur quitte la cellule du piège
                 triggeredTraps.remove(object);
             }
         }
 
-        // Parcourir les monstres
         for (Iterator<Monster> iterator = monsters.iterator(); iterator.hasNext(); ) {
             Monster monster = iterator.next();
             if (player.getX() == monster.getX() && player.getY() == monster.getY()) {
-                // Vérifier si c'est une nouvelle collision
                 if (!collidedMonsters.contains(monster)) {
                     handlePlayerMonsterCollision(player, monster);
-                    collidedMonsters.add(monster); // Marquer le monstre comme "en collision"
+                    collidedMonsters.add(monster);
                 }
             } else {
-                // Réinitialiser la collision si le joueur quitte la cellule du monstre
                 collidedMonsters.remove(monster);
             }
 
-            // Supprimer les monstres morts
             if (!monster.isAlive()) {
-                iterator.remove(); // Supprimer le monstre en toute sécurité
+                iterator.remove();
             }
         }
     }
@@ -366,7 +391,7 @@ public class GameController {
         monster.takeDamage(player.getDamage());
 
         if (!monster.isAlive()) {
-            monsters.remove(monster); // Supprimer le monstre de la liste
+            monsters.remove(monster);
         }
 
         if (!player.isAlive()) {
@@ -382,24 +407,70 @@ public class GameController {
     }
     private void drawMaze() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Effacer tout le canevas
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Dessiner le labyrinthe
         maze.draw(gc);
 
         for (StaticObject object : objects) {
             drawEntity(object, gc);
         }
         drawEntity(player, gc);
-        healthProgress.setProgress((double) player.getHealth()/100);
-        energyProgress.setProgress((double) player.getEnergy()/100);
+        healthProgress.setProgress((double) player.getHealth() / 100);
+        energyProgress.setProgress((double) player.getEnergy() / 100);
+
         for (Monster monster : monsters) {
             drawEntity(monster, gc);
             monster.autoMove(maze);
         }
 
+        // Dessiner et mettre à jour les projectiles
+        for (Iterator<Projectile> iterator = projectiles.iterator(); iterator.hasNext(); ) {
+            Projectile projectile = iterator.next();
+
+            // Vérifier si le projectile a touché un mur
+            if (projectile.hasCollided()) {
+                iterator.remove(); // Supprimer le projectile de la liste
+                continue;
+            }
+
+            // Mettre à jour la position du projectile
+            double deltaTime = 1.0 / 60; // Supposons 60 FPS
+            int cellWidth = (int) Math.round(canvas.getWidth() / maze.getCols());
+            int cellHeight = (int) Math.round(canvas.getHeight() / maze.getRows());
+            projectile.updatePosition(deltaTime, maze, cellWidth, cellHeight);
+
+            // Vérifier les collisions avec les monstres
+            for (Iterator<Monster> monsterIterator = monsters.iterator(); monsterIterator.hasNext(); ) {
+                Monster monster = monsterIterator.next();
+
+                if (checkProjectileMonsterCollision(projectile, monster, cellWidth, cellHeight)) {
+                    monster.takeDamage(20);
+                    iterator.remove();
+
+                    if (monster.getHealth() <= 0 ) {
+                        System.out.println("Le monstre est mort");
+                        monsterIterator.remove();
+                    }else{
+                        System.out.println("monstre pas mort");
+                        System.out.println("monster health : " + monster.getHealth());
+                    }
+
+                    break;
+                }
+            }
+
+            gc.drawImage(projectile.getTexture(), projectile.getX(), projectile.getY(), 10, 10);
+        }
     }
 
+    private boolean checkProjectileMonsterCollision(Projectile projectile, Monster monster, int cellWidth, int cellHeight) {
+        // Convertir les coordonnées du projectile en coordonnées de grille
+        int projectileX = (int) Math.floor(projectile.getX() / cellWidth);
+        int projectileY = (int) Math.floor(projectile.getY() / cellHeight);
+
+        // Vérifier si le projectile est dans la même cellule que le monstre
+        return projectileX == monster.getX() && projectileY == monster.getY();
+    }
     private int[] getRandomValidPosition() {
         int cols = maze.getCols();
         int rows = maze.getRows();
@@ -451,5 +522,12 @@ public class GameController {
 
     public void setName(String name){
         this.playerNameLabel.setText(name);
+    }
+
+    private void playGunShotSound() {
+        String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/gun-shot.mp3").toString();
+        Media sound = new Media(soundPath);
+        MediaPlayer explosionSound = new MediaPlayer(sound);
+        explosionSound.play();
     }
 }
