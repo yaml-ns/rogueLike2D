@@ -9,6 +9,7 @@ public class Player extends Character {
     private final Image[] textures;
     private Image currentTexture;
 
+    private boolean hasKey = false;
 
     public Player(int health, int damage, String name, Image currentTexture) {
         super(0, 0, health, damage, name, currentTexture);
@@ -63,5 +64,12 @@ public class Player extends Character {
 
     public void setEnergy(int energy) {
         this.energy = energy;
+    }
+
+    public boolean hasKey(){
+        return hasKey;
+    }
+    public void setHasKey(boolean b) {
+        this.hasKey = b;
     }
 }

@@ -311,6 +311,12 @@ public class GameController {
         }
 
 
+            int[] keyPosition = getRandomValidPosition();
+
+            Image keyTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/key.gif")));
+            Reward key = new Reward(keyPosition[0], keyPosition[1], "key",keyTexture,0);
+            objects.add(key);
+
         for (int i = 0; i < 4; i++) {
             int[] objetPosition = getRandomValidPosition();
 
@@ -362,7 +368,9 @@ public class GameController {
                         playTrapSound();
                     }
                 } else if (object instanceof Reward) {
-
+                    if (object.getName().equals("key")){
+                        player.setHasKey(true);
+                    }
                     object.onContact(player);
                     iterator.remove();
                     playRewardSound();
@@ -426,23 +434,19 @@ public class GameController {
             monster.autoMove(maze);
         }
 
-        // Dessiner et mettre à jour les projectiles
         for (Iterator<Projectile> iterator = projectiles.iterator(); iterator.hasNext(); ) {
             Projectile projectile = iterator.next();
 
-            // Vérifier si le projectile a touché un mur
             if (projectile.hasCollided()) {
-                iterator.remove(); // Supprimer le projectile de la liste
+                iterator.remove();
                 continue;
             }
 
-            // Mettre à jour la position du projectile
             double deltaTime = 1.0 / 60; // Supposons 60 FPS
             int cellWidth = (int) Math.round(canvas.getWidth() / maze.getCols());
             int cellHeight = (int) Math.round(canvas.getHeight() / maze.getRows());
             projectile.updatePosition(deltaTime, maze, cellWidth, cellHeight);
 
-            // Vérifier les collisions avec les monstres
             for (Iterator<Monster> monsterIterator = monsters.iterator(); monsterIterator.hasNext(); ) {
                 Monster monster = monsterIterator.next();
 
@@ -459,6 +463,14 @@ public class GameController {
             }
 
             gc.drawImage(projectile.getTexture(), projectile.getX(), projectile.getY(), 10, 10);
+        }
+
+        if (hasPlayerReachedDoor()) {
+            if (player.hasKey()){
+                stopGame();
+                playCongratulationSound();
+
+            }
         }
     }
 
@@ -522,6 +534,11 @@ public class GameController {
         this.playerNameLabel.setText(name);
     }
 
+    private boolean hasPlayerReachedDoor() {
+        MazeGenerator.Cell doorCell = maze.getDoorCell();
+        return player.getX() == doorCell.getX() && player.getY() == doorCell.getY();
+    }
+
     private void playGunShotSound() {
         String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/gun-shot.mp3").toString();
         Media sound = new Media(soundPath);
@@ -536,6 +553,12 @@ public class GameController {
     }
     private void playTrapSound() {
         String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/ouch.mp3").toString();
+        Media sound = new Media(soundPath);
+        MediaPlayer explosionSound = new MediaPlayer(sound);
+        explosionSound.play();
+    }
+    private void playCongratulationSound() {
+        String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/congratulations.mp3").toString();
         Media sound = new Media(soundPath);
         MediaPlayer explosionSound = new MediaPlayer(sound);
         explosionSound.play();
