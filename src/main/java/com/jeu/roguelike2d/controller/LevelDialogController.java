@@ -11,15 +11,18 @@ public class LevelDialogController {
     @FXML private VBox container;
     @FXML private Label title;
     @FXML private Label text;
-    private GameController controller;
-    private boolean win = true;
+    private GameController controller; // Référence au GameController
 
     @FXML
-    public void initialize(){
-        if (win){
-            title.setText("Felicitations !");
+    public void initialize() {
+
+    }
+
+    public void updateUI() {
+        if (controller.hasWin()) { // Utilisation directe de hasWin()
+            title.setText("Félicitations !");
             text.setText("Vous avez gagné.");
-        }else{
+        } else {
             title.setText("Loooooser !");
             text.setText("Vous avez perdu.");
         }
@@ -27,17 +30,10 @@ public class LevelDialogController {
 
     @FXML
     private void exitGame() {
-
         controller.exitGame();
     }
 
-
     public void setController(GameController controller) {
         this.controller = controller;
-    }
-
-
-    public void setWin(boolean win) {
-        this.win = win;
     }
 }

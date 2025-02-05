@@ -280,7 +280,6 @@ public class GameController {
         maze = new MazeGenerator(cols, rows, cellWidth, cellHeight, wallTexture, floorTexture, doorTexture);
         while (maze.generateStep());
         player = new Player(100, 0, "Djamel", new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-right.png"))));
-
         monsters.clear();
 
 
@@ -372,6 +371,7 @@ public class GameController {
                         object.onContact(player);
                         triggeredTraps.add(object);
                         playTrapSound();
+                        if (!player.isAlive()){  win=false; stopGame();}
                     }
                 } else if (object instanceof Reward) {
                     if (object.getName().equals("key")){
@@ -411,7 +411,8 @@ public class GameController {
             monsters.remove(monster);
         }
 
-        if (!player.isAlive() || win) {
+        if (!player.isAlive()) {
+            win = false;
             stopGame();
         }
     }
@@ -423,10 +424,10 @@ public class GameController {
             timerAnimation.stop();
         }
         if (win) {
-            soldierSounds.stop();
             playCongratulationSound();
-            Platform.runLater(this::showLevelDialog);
         }
+        soldierSounds.stop();
+        Platform.runLater(this::showLevelDialog);
         drawMaze();
     }
     private void drawMaze() {
@@ -558,7 +559,7 @@ public class GameController {
             Parent root = loader.load();
             LevelDialogController controller = loader.getController();
             controller.setController(this);
-            controller.setWin(this.win);
+            controller.updateUI();
             Scene scene = new Scene(root);
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -596,5 +597,15 @@ public class GameController {
         Media sound = new Media(soundPath);
         MediaPlayer explosionSound = new MediaPlayer(sound);
         explosionSound.play();
+    }
+    private void playLooseSound() {
+        String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/congratulations.mp3").toString();
+        Media sound = new Media(soundPath);
+        MediaPlayer explosionSound = new MediaPlayer(sound);
+        explosionSound.play();
+    }
+
+    public boolean hasWin() {
+        return this.win;
     }
 }
