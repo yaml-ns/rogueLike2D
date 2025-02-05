@@ -377,6 +377,7 @@ public class GameController {
             if (player.getX() == monster.getX() && player.getY() == monster.getY()) {
                 if (!collidedMonsters.contains(monster)) {
                     handlePlayerMonsterCollision(player, monster);
+                    playTrapSound();
                     collidedMonsters.add(monster);
                 }
             } else {
