@@ -425,6 +425,8 @@ public class GameController {
         }
         if (win) {
             playCongratulationSound();
+        }else {
+            playLooseSound();
         }
         soldierSounds.stop();
         Platform.runLater(this::showLevelDialog);
@@ -599,7 +601,7 @@ public class GameController {
         explosionSound.play();
     }
     private void playLooseSound() {
-        String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/congratulations.mp3").toString();
+        String soundPath = getClass().getResource("/com/jeu/roguelike2d/sons/you-lose.mp3").toString();
         Media sound = new Media(soundPath);
         MediaPlayer explosionSound = new MediaPlayer(sound);
         explosionSound.play();
