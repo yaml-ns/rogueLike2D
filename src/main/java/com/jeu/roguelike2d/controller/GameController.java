@@ -4,7 +4,11 @@ import com.jeu.roguelike2d.model.*;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -17,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -418,10 +423,11 @@ public class GameController {
             timerAnimation.stop();
         }
         if (win) {
+            soldierSounds.stop();
             playCongratulationSound();
+            Platform.runLater(this::showLevelDialog);
         }
         drawMaze();
-        System.out.println("Game stopped.");
     }
     private void drawMaze() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -472,10 +478,8 @@ public class GameController {
             gc.drawImage(projectile.getTexture(), projectile.getX(), projectile.getY(), 10, 10);
         }
 
-
         if (!win && hasPlayerReachedDoor() && player.hasKey()) {
             win = true;
-            System.out.println("Félicitations ! Vous avez atteint la porte !");
             playCongratulationSound();
             stopGame();
         }
@@ -544,6 +548,29 @@ public class GameController {
     private boolean hasPlayerReachedDoor() {
         MazeGenerator.Cell doorCell = maze.getDoorCell();
         return player.getX() == doorCell.getX() && player.getY() == doorCell.getY();
+    }
+
+
+    private void showLevelDialog() {
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jeu/roguelike2d/view/level-dialog.fxml"));
+            Parent root = loader.load();
+            LevelDialogController controller = loader.getController();
+            controller.setController(this);
+            controller.setWin(this.win);
+            Scene scene = new Scene(root);
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle(win ? "Victoire !" : "Perdu !");
+            dialogStage.setScene(scene);
+            dialogStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            Stage primaryStage = (Stage) canvas.getScene().getWindow();
+            dialogStage.initOwner(primaryStage);
+            dialogStage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void playGunShotSound() {
