@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Glow?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -23,7 +24,19 @@
                <VBox.margin>
                   <Insets bottom="20.0" />
                </VBox.margin>
+               <effect>
+                  <Glow />
+               </effect>
             </Label>
+            <Label fx:id="errors" prefHeight="18.0" prefWidth="311.0" style="-fx-background-color: #340D02;" text="Label" textFill="WHITE" visible="false">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label prefHeight="18.0" prefWidth="311.0" text="Quel est votre nom ?" textFill="WHITE" />
               <TextField fx:id="nameField" alignment="CENTER" prefHeight="45.0" prefWidth="312.0" promptText="Entrez votre nom..." styleClass="name-input">
                <font>
                   <Font size="20.0" />

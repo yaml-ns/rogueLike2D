@@ -2,6 +2,7 @@ package com.jeu.roguelike2d.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,6 +25,7 @@ public class StartController {
     @FXML private TextField nameField;
     @FXML private Button startButton;
     @FXML private Button closeButton;
+    @FXML private Label errors;
 
     @FXML
     public void initialize(){
@@ -53,6 +55,9 @@ public class StartController {
             Stage stage = (Stage) startButton.getScene().getWindow();
             Scene gameScene = new Scene(root, width, height);
             stage.setScene(gameScene);
+        }else{
+            errors.setText("Saisis ton nom soldat !");
+            errors.setVisible(true);
         }
     }
 
