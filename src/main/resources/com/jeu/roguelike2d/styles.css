@@ -2,7 +2,13 @@
     -fx-background-color: rgba(18, 18, 18, 0.8);
 }
 .start-view-button:hover {
-    -fx-background-color: rgba(18, 18, 18, 1);
+    -fx-background-color: rgb(52, 13, 2);
+}
+.start-view-button:focused {
+    -fx-border-color: rgb(122, 56, 2);
+}
+.name-input:focused {
+    -fx-border-color: rgb(122, 56, 2);
 }
 .name-input {
     -fx-background-color: rgba(18, 18, 18, 0.8);
