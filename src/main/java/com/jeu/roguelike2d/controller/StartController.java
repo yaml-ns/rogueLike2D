@@ -7,10 +7,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
 import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +24,6 @@ public class StartController {
     @FXML private TextField nameField;
     @FXML private Button startButton;
     @FXML private Button closeButton;
-
-
 
     @FXML
     public void initialize(){
@@ -35,10 +36,7 @@ public class StartController {
         backgroundImage.setFitHeight(height);
         backgroundImage.setPreserveRatio(false);
 
-        String soundFile = "file:src/main/resources/com/jeu/roguelike2d/sons/epic.wav";
-        AudioClip audioClip = new AudioClip(soundFile);
-        audioClip.setCycleCount(AudioClip.INDEFINITE);
-        audioClip.play();
+
 
     }
 

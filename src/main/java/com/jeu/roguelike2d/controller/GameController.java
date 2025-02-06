@@ -279,41 +279,41 @@ public class GameController {
 
         maze = new MazeGenerator(cols, rows, cellWidth, cellHeight, wallTexture, floorTexture, doorTexture);
         while (maze.generateStep());
-        player = new Player(100, 0, "Djamel", new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-right.png"))));
+        player = new Player(100, 0, playerNameLabel.getText(), new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/player-right.png"))));
         monsters.clear();
 
 
-//        for (int i = 0; i < 2; i++) {
-//            int[] monsterPosition = getRandomValidPosition();
-//
-//            Image dragonTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/dragon.png")));
-//            Dragon dragon = new Dragon(monsterPosition[0], monsterPosition[1], dragonTexture,cellWidth, cellHeight);
-//            dragon.setRealX(monsterPosition[0] * cellWidth);
-//            dragon.setRealY(monsterPosition[1] * cellHeight);
-//            dragon.setController(this);
-//            monsters.add(dragon);
-//        }
-//
-//        for (int i = 0; i < 5; i++) {
-//            int[] monsterPosition = getRandomValidPosition();
-//
-//            Image chupacabraTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/chupacabra.png")));
-//            Chupacabra chupacabra = new Chupacabra(monsterPosition[0], monsterPosition[1], chupacabraTexture,cellWidth, cellHeight);
-//            chupacabra.setRealX(monsterPosition[0] * cellWidth);
-//            chupacabra.setRealY(monsterPosition[1] * cellHeight);
-//            chupacabra.setController(this);
-//            monsters.add(chupacabra);
-//        }
-//        for (int i = 0; i < 3; i++) {
-//            int[] monsterPosition = getRandomValidPosition();
-//
-//            Image goraTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/gora.png")));
-//            Gora gora = new Gora(monsterPosition[0], monsterPosition[1], goraTexture,player, cellWidth, cellHeight);
-//            gora.setRealX(monsterPosition[0] * cellWidth);
-//            gora.setRealY(monsterPosition[1] * cellHeight);
-//            gora.setController(this);
-//            monsters.add(gora);
-//        }
+        for (int i = 0; i < 2; i++) {
+            int[] monsterPosition = getRandomValidPosition();
+
+            Image dragonTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/dragon.png")));
+            Dragon dragon = new Dragon(monsterPosition[0], monsterPosition[1], dragonTexture,cellWidth, cellHeight);
+            dragon.setRealX(monsterPosition[0] * cellWidth);
+            dragon.setRealY(monsterPosition[1] * cellHeight);
+            dragon.setController(this);
+            monsters.add(dragon);
+        }
+
+        for (int i = 0; i < 5; i++) {
+            int[] monsterPosition = getRandomValidPosition();
+
+            Image chupacabraTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/chupacabra.png")));
+            Chupacabra chupacabra = new Chupacabra(monsterPosition[0], monsterPosition[1], chupacabraTexture,cellWidth, cellHeight);
+            chupacabra.setRealX(monsterPosition[0] * cellWidth);
+            chupacabra.setRealY(monsterPosition[1] * cellHeight);
+            chupacabra.setController(this);
+            monsters.add(chupacabra);
+        }
+        for (int i = 0; i < 3; i++) {
+            int[] monsterPosition = getRandomValidPosition();
+
+            Image goraTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/gora.png")));
+            Gora gora = new Gora(monsterPosition[0], monsterPosition[1], goraTexture,player, cellWidth, cellHeight);
+            gora.setRealX(monsterPosition[0] * cellWidth);
+            gora.setRealY(monsterPosition[1] * cellHeight);
+            gora.setController(this);
+            monsters.add(gora);
+        }
 
 
             int[] keyPosition = getRandomValidPosition();
