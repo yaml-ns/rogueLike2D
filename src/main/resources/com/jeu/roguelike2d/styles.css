@@ -16,8 +16,8 @@
 }
 .progress-bar {
     -fx-background-color: rgba(7, 7, 7, 0.87);
-    -fx-border-color: black;         /* Bordure noire */
-    -fx-border-width: 2px;           /* Épaisseur de la bordure */
+    -fx-border-color: black;
+    -fx-border-width: 2px;
     -fx-border-radius: 5px;
 }
 .lifeProgressBar  .bar {
