@@ -611,7 +611,7 @@ public class GameController {
 
     private void adjustTopBarPosition() {
         if (player.getY() <= 1) {
-            topBar.setOpacity(0.3);
+            topBar.setOpacity(0.1);
         } else {
             topBar.setOpacity(1);
         }
