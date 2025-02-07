@@ -273,8 +273,8 @@ public class GameController {
         int cellWidth = (int) Math.round(screenWidth / cols);
         int cellHeight = (int) Math.round(screenHeight / rows);
 
-        Image wallTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/metal.png")));
-        Image floorTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/pave.png")));
+        Image wallTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/rust.jpg")));
+        Image floorTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/metal-noir.png")));
         Image doorTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/jeu/roguelike2d/images/porte.jpg")));
 
         maze = new MazeGenerator(cols, rows, cellWidth, cellHeight, wallTexture, floorTexture, doorTexture);
@@ -481,6 +481,8 @@ public class GameController {
             gc.drawImage(projectile.getTexture(), projectile.getX(), projectile.getY(), 10, 10);
         }
 
+        adjustTopBarPosition();
+
         if (!win && hasPlayerReachedDoor() && player.hasKey()) {
             win = true;
             playCongratulationSound();
@@ -605,6 +607,14 @@ public class GameController {
         Media sound = new Media(soundPath);
         MediaPlayer explosionSound = new MediaPlayer(sound);
         explosionSound.play();
+    }
+
+    private void adjustTopBarPosition() {
+        if (player.getY() <= 1) {
+            topBar.setOpacity(0.3);
+        } else {
+            topBar.setOpacity(1);
+        }
     }
 
     public boolean hasWin() {

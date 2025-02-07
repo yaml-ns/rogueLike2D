@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="container" alignment="CENTER" prefHeight="250.0" prefWidth="450.0" spacing="10" style="-fx-background-color: #000000cc; -fx-padding: 20;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jeu.roguelike2d.controller.LevelDialogController">
+<VBox fx:id="container" alignment="CENTER" prefHeight="250.0" prefWidth="450.0" spacing="10" style="-fx-background-color: #000000ee; -fx-padding: 20;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jeu.roguelike2d.controller.LevelDialogController">
     <Label fx:id="title" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Félicitations !" textAlignment="CENTER" textFill="WHITE">
       <font>
          <Font name="Arial Black" size="48.0" />

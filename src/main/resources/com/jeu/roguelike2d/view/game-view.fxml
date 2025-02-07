@@ -20,16 +20,13 @@
 
     <!-- Barre du haut (hauteur dynamique) -->
     <HBox fx:id="topBar" alignment="CENTER" fillHeight="false" layoutX="3.2" maxHeight="46.0" prefHeight="46.0" prefWidth="823.0" spacing="20.0" style="-fx-background-color: rgba(0, 0, 0, 0.7); -fx-padding: 10px;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <Label fx:id="playerNameLabel" style="-fx-text-fill: white;" text="Nom: ">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font></Label>
+        <Label fx:id="playerNameLabel" style="-fx-text-fill: white;" text="Nom: ???" />
       <ProgressBar fx:id="energyProgress" prefWidth="200.0" progress="0.0" styleClass="energyProgressBar" />
       <ProgressBar fx:id="healthProgress" prefWidth="200.0" progress="1.0" styleClass="lifeProgressBar" />
-        <Label fx:id="timeLabel" style="-fx-text-fill: white;" text="Temps: 00:00">
+        <Label fx:id="timeLabel" style="-fx-text-fill: white;" text="Temps: 00:00" />
+      <Button fx:id="exit" mnemonicParsing="false" onAction="#exitGame" style="-fx-background-color: #340D02;" text="Quitter" textFill="WHITE">
          <font>
-            <Font name="System Bold" size="20.0" />
-         </font></Label>
-      <Button fx:id="exit" mnemonicParsing="false" onAction="#exitGame" styleClass="start-view-button" text="Quitter" />
+            <Font name="System Bold Italic" size="10.0" />
+         </font></Button>
     </HBox>
 </AnchorPane>
